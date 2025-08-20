@@ -1,0 +1,53 @@
+/* Page not found container */
+.not-found-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  padding: 20px;
+}
+
+/* Content container */
+.not-found-content {
+  text-align: center;
+  max-width: 500px;
+}
+
+/* Error code styling */
+.error-code {
+  font-size: 120px;
+  font-weight: 700;
+  color: #3f51b5;
+  line-height: 1;
+  margin-bottom: 20px;
+}
+
+/* Error title */
+.error-title {
+  font-size: 32px;
+  font-weight: 500;
+  margin-bottom: 16px;
+  color: #333;
+}
+
+/* Error message */
+.error-message {
+  font-size: 18px;
+  color: #666;
+  margin-bottom: 32px;
+}
+
+/* Media query for responsive design */
+@media (max-width: 768px) {
+  .error-code {
+    font-size: 80px;
+  }
+  
+  .error-title {
+    font-size: 24px;
+  }
+  
+  .error-message {
+    font-size: 16px;
+  }
+}

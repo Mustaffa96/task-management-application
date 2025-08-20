@@ -1,0 +1,62 @@
+/* Sidenav container styles */
+.sidenav-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* User profile section */
+.user-profile {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  background-color: #3f51b5;
+  color: white;
+}
+
+/* Avatar styles */
+.avatar {
+  margin-right: 16px;
+}
+
+/* Avatar icon */
+.avatar-icon {
+  font-size: 40px;
+  height: 40px;
+  width: 40px;
+}
+
+/* User information container */
+.user-info {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* User name */
+.user-name {
+  font-weight: 500;
+  font-size: 16px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* User email */
+.user-email {
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0.8;
+}
+
+/* Active link styling */
+.active {
+  background-color: rgba(63, 81, 181, 0.1);
+  color: #3f51b5;
+  
+  mat-icon {
+    color: #3f51b5;
+  }
+}

@@ -1,0 +1,55 @@
+<!-- Header toolbar -->
+<mat-toolbar color="primary" class="header">
+  <!-- Left side: Menu toggle and app title -->
+  <div class="header-left">
+    <!-- Menu toggle button -->
+    <button mat-icon-button (click)="onToggleSidenav()" aria-label="Toggle navigation menu">
+      <mat-icon>menu</mat-icon>
+    </button>
+    
+    <!-- App title -->
+    <span class="app-title" routerLink="/">Task Management</span>
+  </div>
+  
+  <!-- Right side: Navigation and user actions -->
+  <div class="header-right">
+    <!-- Navigation links for authenticated users -->
+    <ng-container *ngIf="isAuthenticated">
+      <button mat-button routerLink="/tasks" routerLinkActive="active">
+        <mat-icon>list</mat-icon>
+        <span class="nav-label">Tasks</span>
+      </button>
+      
+      <button mat-button [matMenuTriggerFor]="userMenu" class="user-menu-button">
+        <mat-icon>account_circle</mat-icon>
+        <span class="nav-label">{{ userName }}</span>
+        <mat-icon>arrow_drop_down</mat-icon>
+      </button>
+      
+      <!-- User dropdown menu -->
+      <mat-menu #userMenu="matMenu">
+        <button mat-menu-item routerLink="/profile">
+          <mat-icon>person</mat-icon>
+          <span>Profile</span>
+        </button>
+        <button mat-menu-item (click)="onLogout()">
+          <mat-icon>exit_to_app</mat-icon>
+          <span>Logout</span>
+        </button>
+      </mat-menu>
+    </ng-container>
+    
+    <!-- Authentication links for guests -->
+    <ng-container *ngIf="!isAuthenticated">
+      <button mat-button routerLink="/login" routerLinkActive="active">
+        <mat-icon>login</mat-icon>
+        <span class="nav-label">Login</span>
+      </button>
+      
+      <button mat-button routerLink="/register" routerLinkActive="active">
+        <mat-icon>person_add</mat-icon>
+        <span class="nav-label">Register</span>
+      </button>
+    </ng-container>
+  </div>
+</mat-toolbar>

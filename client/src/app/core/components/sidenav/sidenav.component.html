@@ -1,0 +1,67 @@
+<!-- Sidenav container -->
+<div class="sidenav-container">
+  <!-- User profile section (shown when authenticated) -->
+  <div class="user-profile" *ngIf="isAuthenticated">
+    <div class="avatar">
+      <mat-icon class="avatar-icon">account_circle</mat-icon>
+    </div>
+    <div class="user-info">
+      <div class="user-name">{{ userName }}</div>
+      <div class="user-email">{{ userEmail }}</div>
+    </div>
+  </div>
+  
+  <!-- Navigation links -->
+  <mat-nav-list>
+    <!-- Links for authenticated users -->
+    <ng-container *ngIf="isAuthenticated">
+      <!-- Dashboard link -->
+      <a mat-list-item routerLink="/tasks" routerLinkActive="active">
+        <mat-icon matListItemIcon>dashboard</mat-icon>
+        <span matListItemTitle>Dashboard</span>
+      </a>
+      
+      <!-- My Tasks link -->
+      <a mat-list-item routerLink="/tasks/my-tasks" routerLinkActive="active">
+        <mat-icon matListItemIcon>assignment</mat-icon>
+        <span matListItemTitle>My Tasks</span>
+      </a>
+      
+      <!-- Assigned Tasks link -->
+      <a mat-list-item routerLink="/tasks/assigned" routerLinkActive="active">
+        <mat-icon matListItemIcon>assignment_ind</mat-icon>
+        <span matListItemTitle>Assigned to Me</span>
+      </a>
+      
+      <!-- Create Task link -->
+      <a mat-list-item routerLink="/tasks/create" routerLinkActive="active">
+        <mat-icon matListItemIcon>add_circle</mat-icon>
+        <span matListItemTitle>Create Task</span>
+      </a>
+      
+      <!-- Divider -->
+      <mat-divider></mat-divider>
+      
+      <!-- Profile link -->
+      <a mat-list-item routerLink="/profile" routerLinkActive="active">
+        <mat-icon matListItemIcon>person</mat-icon>
+        <span matListItemTitle>Profile</span>
+      </a>
+    </ng-container>
+    
+    <!-- Links for guests -->
+    <ng-container *ngIf="!isAuthenticated">
+      <!-- Login link -->
+      <a mat-list-item routerLink="/login" routerLinkActive="active">
+        <mat-icon matListItemIcon>login</mat-icon>
+        <span matListItemTitle>Login</span>
+      </a>
+      
+      <!-- Register link -->
+      <a mat-list-item routerLink="/register" routerLinkActive="active">
+        <mat-icon matListItemIcon>person_add</mat-icon>
+        <span matListItemTitle>Register</span>
+      </a>
+    </ng-container>
+  </mat-nav-list>
+</div>

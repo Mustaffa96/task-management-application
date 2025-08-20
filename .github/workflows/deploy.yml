@@ -1,0 +1,108 @@
+name: Deploy Application
+
+# Trigger the workflow on push to main branch
+on:
+  push:
+    branches: [ main ]
+    paths-ignore:
+      - '**.md'
+      - '.gitignore'
+
+jobs:
+  deploy-backend:
+    runs-on: ubuntu-latest
+    
+    steps:
+      # Checkout repository
+      - uses: actions/checkout@v3
+      
+      # Set up Node.js environment
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+          cache: 'npm'
+          cache-dependency-path: server/package-lock.json
+      
+      # Install dependencies
+      - name: Install dependencies
+        working-directory: ./server
+        run: npm ci
+      
+      # Run tests
+      - name: Run tests
+        working-directory: ./server
+        run: npm test
+        env:
+          NODE_ENV: test
+          MONGODB_URI: mongodb://localhost:27017/task-management-test
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          JWT_EXPIRES_IN: 1h
+      
+      # Build application
+      - name: Build application
+        working-directory: ./server
+        run: npm run build
+      
+      # Deploy to production (example using Heroku)
+      - name: Deploy to Heroku
+        uses: akhileshns/heroku-deploy@v3.12.14
+        with:
+          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+          heroku_app_name: ${{ secrets.HEROKU_BACKEND_APP_NAME }}
+          heroku_email: ${{ secrets.HEROKU_EMAIL }}
+          appdir: "server"
+        env:
+          HD_NODE_ENV: production
+          HD_MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          HD_JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          HD_JWT_EXPIRES_IN: ${{ secrets.JWT_EXPIRES_IN }}
+          HD_PORT: ${{ secrets.PORT }}
+  
+  deploy-frontend:
+    runs-on: ubuntu-latest
+    needs: deploy-backend
+    
+    steps:
+      # Checkout repository
+      - uses: actions/checkout@v3
+      
+      # Set up Node.js environment
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+          cache: 'npm'
+          cache-dependency-path: client/package-lock.json
+      
+      # Install dependencies
+      - name: Install dependencies
+        working-directory: ./client
+        run: npm ci
+      
+      # Set API URL based on backend deployment
+      - name: Set API URL
+        working-directory: ./client
+        run: |
+          echo "API_URL=https://${{ secrets.HEROKU_BACKEND_APP_NAME }}.herokuapp.com/api" > .env.production
+      
+      # Build production bundle with optimizations
+      - name: Build production
+        working-directory: ./client
+        run: npm run build:prod
+      
+      # Deploy to Netlify
+      - name: Deploy to Netlify
+        uses: nwtgck/actions-netlify@v2
+        with:
+          publish-dir: './client/dist'
+          production-branch: main
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          deploy-message: "Deploy from GitHub Actions"
+          enable-pull-request-comment: true
+          enable-commit-comment: true
+          overwrites-pull-request-comment: true
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        timeout-minutes: 5

@@ -1,0 +1,86 @@
+/* Register container styles */
+.register-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* Register card styles */
+.register-card {
+  width: 100%;
+  max-width: 450px;
+  padding: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+}
+
+/* Card header styles */
+mat-card-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* Register icon */
+.register-icon {
+  vertical-align: middle;
+  margin-right: 8px;
+  font-size: 24px;
+}
+
+/* Form styles */
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Full width utility class */
+.full-width {
+  width: 100%;
+}
+
+/* Register button styles */
+.register-button {
+  height: 48px;
+  font-size: 16px;
+  font-weight: 500;
+  margin-top: 16px;
+  position: relative;
+}
+
+/* Button spinner styles */
+.button-spinner {
+  margin-right: 8px;
+}
+
+/* Login link styles */
+.login-link {
+  text-align: center;
+  margin: 16px 0 0 0;
+  color: #666;
+}
+
+/* Link styles */
+.link {
+  color: #3f51b5;
+  text-decoration: none;
+  font-weight: 500;
+  
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+/* Media query for responsive design */
+@media (max-width: 768px) {
+  .register-container {
+    padding: 16px;
+  }
+  
+  .register-card {
+    padding: 16px;
+  }
+}

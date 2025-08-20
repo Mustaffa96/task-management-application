@@ -1,0 +1,72 @@
+name: Backend CI
+
+# Trigger the workflow on push and pull requests to main branch
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'server/**'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'server/**'
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    
+    # Service containers to run with the job
+    services:
+      # MongoDB service container
+      mongodb:
+        image: mongo:4.4
+        ports:
+          - 27017:27017
+    
+    strategy:
+      matrix:
+        node-version: [16.x, 18.x]
+    
+    steps:
+      # Checkout repository
+      - uses: actions/checkout@v3
+      
+      # Set up Node.js environment
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+          cache-dependency-path: server/package-lock.json
+      
+      # Install dependencies
+      - name: Install dependencies
+        working-directory: ./server
+        run: npm ci
+      
+      # Run ESLint
+      - name: Lint code
+        working-directory: ./server
+        run: npm run lint
+      
+      # Run TypeScript compiler
+      - name: Type check
+        working-directory: ./server
+        run: npm run build
+      
+      # Run tests
+      - name: Run tests
+        working-directory: ./server
+        run: npm test
+        env:
+          NODE_ENV: test
+          MONGODB_URI: mongodb://localhost:27017/task-management-test
+          JWT_SECRET: test-secret-key
+          JWT_EXPIRES_IN: 1h
+      
+      # Upload test coverage as artifact
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-report
+          path: server/coverage/

@@ -1,0 +1,69 @@
+name: Frontend CI
+
+# Trigger the workflow on push and pull requests to main branch
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'client/**'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'client/**'
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [16.x, 18.x]
+    
+    steps:
+      # Checkout repository
+      - uses: actions/checkout@v3
+      
+      # Set up Node.js environment
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+          cache-dependency-path: client/package-lock.json
+      
+      # Install dependencies
+      - name: Install dependencies
+        working-directory: ./client
+        run: npm ci
+      
+      # Run ESLint
+      - name: Lint code
+        working-directory: ./client
+        run: npm run lint
+      
+      # Run TypeScript compiler
+      - name: Type check
+        working-directory: ./client
+        run: npm run build
+      
+      # Run tests
+      - name: Run tests
+        working-directory: ./client
+        run: npm test -- --no-watch --no-progress --browsers=ChromeHeadlessCI
+      
+      # Build production bundle
+      - name: Build production
+        working-directory: ./client
+        run: npm run build:prod
+      
+      # Analyze bundle size
+      - name: Analyze bundle size
+        working-directory: ./client
+        run: npm run analyze
+      
+      # Upload build as artifact
+      - name: Upload build
+        uses: actions/upload-artifact@v3
+        with:
+          name: frontend-build
+          path: client/dist/

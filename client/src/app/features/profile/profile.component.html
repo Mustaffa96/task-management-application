@@ -1,0 +1,44 @@
+<!-- Profile container -->
+<div class="profile-container">
+  <mat-card class="profile-card">
+    <!-- Card header -->
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon class="profile-icon">account_circle</mat-icon>
+        My Profile
+      </mat-card-title>
+      <mat-card-subtitle>Manage your account information</mat-card-subtitle>
+    </mat-card-header>
+    
+    <!-- Loading spinner -->
+    <div *ngIf="isLoading" class="loading-container">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+    
+    <!-- Profile content -->
+    <mat-card-content *ngIf="!isLoading">
+      <div class="profile-info">
+        <h2>Account Information</h2>
+        <p><strong>Name:</strong> John Doe</p>
+        <p><strong>Email:</strong> john.doe@example.com</p>
+        <p><strong>Member Since:</strong> January 1, 2025</p>
+      </div>
+      
+      <mat-divider></mat-divider>
+      
+      <div class="profile-actions">
+        <h2>Account Actions</h2>
+        <div class="action-buttons">
+          <button mat-raised-button color="primary">
+            <mat-icon>edit</mat-icon>
+            Edit Profile
+          </button>
+          <button mat-raised-button color="warn">
+            <mat-icon>lock</mat-icon>
+            Change Password
+          </button>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>
