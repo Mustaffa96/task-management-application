@@ -1,0 +1,84 @@
+/* Task edit container styles */
+.task-edit-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Back button styles */
+.back-button {
+  margin-bottom: 10px;
+}
+
+/* Page title styles */
+.page-title {
+  font-size: 24px;
+  font-weight: 500;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+/* Loading container styles */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  padding: 40px 0;
+}
+
+/* Error container styles */
+.error-container {
+  text-align: center;
+  padding: 20px;
+  background-color: #fff3f3;
+  border-radius: 4px;
+  margin: 20px 0;
+
+  .retry-button {
+    margin-top: 15px;
+  }
+}
+
+/* Form container styles */
+.task-form-container {
+  margin-top: 20px;
+}
+
+/* Form styles */
+.task-form {
+  mat-card {
+    padding: 16px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* Full width form field styles */
+.full-width {
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+/* Form row styles */
+.form-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 15px;
+
+  mat-form-field {
+    flex: 1;
+  }
+}
+
+/* Card actions styles */
+mat-card-actions {
+  display: flex;
+  gap: 10px;
+  padding: 16px 0;
+}
+
+/* Responsive styles for mobile */
+@media (max-width: 599px) {
+  .form-row {
+    flex-direction: column;
+    gap: 0;
+  }
+}

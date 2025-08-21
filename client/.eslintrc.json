@@ -1,19 +1,27 @@
 {
   "root": true,
   "ignorePatterns": [
-    "projects/**/*"
+    "projects/**/*",
+    "node_modules/**/*",
+    "dist/**/*"
   ],
+  "parserOptions": {
+    "project": "./tsconfig.eslint.json",
+    "tsconfigRootDir": ".",
+    "sourceType": "module"
+  },
   "overrides": [
     {
       "files": [
         "*.ts"
       ],
+      "parser": "@typescript-eslint/parser",
       "extends": [
         "eslint:recommended",
-        "@typescript-eslint/recommended",
-        "@typescript-eslint/recommended-requiring-type-checking",
-        "@angular-eslint/recommended",
-        "@angular-eslint/template/process-inline-templates"
+        "plugin:@typescript-eslint/recommended",
+        "plugin:@typescript-eslint/recommended-requiring-type-checking",
+        "plugin:@angular-eslint/recommended",
+        "plugin:@angular-eslint/template/process-inline-templates"
       ],
       "rules": {
         "@angular-eslint/directive-selector": [
@@ -43,7 +51,7 @@
         "*.html"
       ],
       "extends": [
-        "@angular-eslint/template/recommended"
+        "plugin:@angular-eslint/template/recommended"
       ],
       "rules": {}
     }

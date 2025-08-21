@@ -2,7 +2,8 @@
  * Main application component
  * Root component that hosts all other components
  */
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
+import type { OnInit } from '@angular/core';
 import { AuthService } from './core/services/auth.service';
 
 /**
@@ -29,7 +30,7 @@ export class AppComponent implements OnInit {
    * Constructor
    * @param authService Authentication service
    */
-  constructor(private authService: AuthService) {}
+  constructor(private readonly authService: AuthService) {}
   
   /**
    * Lifecycle hook that is called after component initialization

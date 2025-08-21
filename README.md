@@ -10,6 +10,18 @@ A full-stack task management application built with the MEAN stack (MongoDB, Exp
 - Implemented Angular frontend with Material UI components
 - Added role-based authorization for different user types
 - Created responsive UI with mobile-friendly design
+- **Enhanced token refresh mechanism** to prevent automatic logouts
+- **Improved CORS configuration** for better cross-origin security
+- **Added client-side token validation** to reduce unnecessary API calls
+- **Fixed authentication persistence** across browser sessions
+- **Fixed login response handling** to properly process nested API responses
+- **Fixed task service API response handling** to correctly process nested data structure from backend
+- **Fixed backend route for assigned tasks** to properly handle `/api/tasks/assigned` endpoint and prevent CastError with ObjectId
+- **Implemented complete API fetch methods** for `/tasks/my-tasks`, `/tasks/assigned`, `/tasks/create`, and `/users/profile` endpoints
+- **Added new task management components** for My Tasks, Assigned Tasks, and Task Creation with responsive UI
+- **Implemented full task management functionality** with task detail view, edit capabilities, and delete operations
+- **Fixed task-detail component TypeScript errors** by removing unnecessary optional chaining operators and adding helper methods for proper type handling
+- **Fixed task edit and delete functionality** by correcting the routing order in tasks-routing.module.ts to ensure specific routes like 'edit/:id' come before generic ':id' routes
 
 ## Features
 
@@ -40,6 +52,14 @@ A full-stack task management application built with the MEAN stack (MongoDB, Exp
 - **Route Guards** for protecting authenticated routes
 - **HTTP Interceptors** for handling auth tokens and errors
 - **Responsive Design** with mobile-first approach
+- **Consistent API Services** with standardized error handling and response processing
+- **Task Management Components**:
+  - **My Tasks**: View and manage tasks created by the current user
+  - **Assigned Tasks**: View and update tasks assigned to the current user
+  - **Task Creation**: Form with validation for creating new tasks
+  - **Task Detail**: View detailed information about a specific task with options to edit or delete
+  - **Task Edit**: Form with validation for updating existing tasks and reassigning to different users
+  - **Task List**: Enhanced with view, edit, and delete actions for each task
 
 ### DevOps
 - **GitHub Actions** for CI/CD
@@ -78,16 +98,51 @@ A full-stack task management application built with the MEAN stack (MongoDB, Exp
     └── workflows/              # CI/CD pipeline configurations
 ```
 
+## API Services
+
+The application implements standardized API services with consistent error handling and response processing:
+
+### Task Service
+
+- **getTasks(filter?)**: Fetches all tasks with optional filtering by status, priority, assignee, etc.
+- **getMyTasks()**: Retrieves tasks created by the current user via `/api/tasks/my-tasks`
+- **getAssignedTasks()**: Retrieves tasks assigned to the current user via `/api/tasks/assigned`
+- **getTask(id)**: Gets a single task by ID with detailed information
+- **createTask(task)**: Creates a new task with proper validation
+- **updateTask(id, task)**: Updates an existing task with authorization checks
+- **deleteTask(id)**: Deletes a task with proper authorization and confirmation
+
+### User Service
+
+- **getProfile()**: Fetches the current user's profile via `/api/users/profile`
+- **getUsers()**: Retrieves all users (admin only)
+- **getUser(id)**: Gets a specific user by ID
+- **updateProfile(userData)**: Updates the current user's profile
+- **updateUser(id, userData)**: Updates a specific user (admin only)
+- **deleteUser(id)**: Deletes a user (admin only)
+
+All API services feature:
+- Consistent response structure handling
+- Comprehensive error handling with appropriate fallbacks
+- Special handling for authentication errors (401)
+- Proper date transformation for task dates
+- Detailed console logging for debugging
+- Type safety with TypeScript interfaces
+
 ## Security Features
 
-- **JWT Authentication**: Secure token-based authentication
+- **JWT Authentication**: Secure token-based authentication with both cookie and header support
 - **HttpOnly Cookies**: Prevents client-side JavaScript from accessing tokens
-- **Token Refresh**: Automatic refresh of expired tokens
+- **Advanced Token Refresh**: Proactive token refresh before expiration to prevent session timeouts
+- **Token Expiration Handling**: Intelligent handling of expired tokens with automatic refresh attempts
+- **Client-side Token Validation**: Checks token expiration before making unnecessary API calls
 - **Role-Based Authorization**: Different permissions for users and admins
 - **Input Validation**: Server-side validation of all inputs
 - **Error Handling**: Centralized error handling with appropriate status codes
-- **CORS Protection**: Configured for secure cross-origin requests
+- **CORS Protection**: Configured for secure cross-origin requests with credentials support
 - **Password Hashing**: Secure password storage with bcrypt
+- **Dual Authentication Strategy**: Supports both cookie-based and header-based token authentication
+- **Graceful Session Recovery**: Attempts to recover user sessions when possible
 
 ## Getting Started
 
@@ -141,7 +196,19 @@ A full-stack task management application built with the MEAN stack (MongoDB, Exp
    pnpm start
    ```
 
-5. Open your browser and navigate to `http://localhost:4200`
+5. Seed the database with test data (optional)
+   ```bash
+   # In the server directory
+   cd server
+   pnpm seed
+   ```
+   
+   This will populate your database with:
+   - Sample users (admin and regular users)
+   - Sample tasks with various statuses and priorities
+   - Default password for all seeded users is `password123`
+
+6. Open your browser and navigate to `http://localhost:4200`
 
    The backend API will be available at `http://localhost:8000/api` with these endpoints:
    - Authentication: `http://localhost:8000/api/auth`

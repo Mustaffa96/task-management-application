@@ -35,14 +35,16 @@ describe('FooterComponent', () => {
 
   // Test footer links display
   it('should display footer links', () => {
-    const footerElement: HTMLElement = fixture.nativeElement;
+    // Properly type the nativeElement to avoid unsafe assignment
+    const footerElement = fixture.nativeElement as HTMLElement;
     const links = footerElement.querySelectorAll('a');
     
     // Check if we have at least 3 links (Privacy, Terms, Contact)
     expect(links.length).toBeGreaterThanOrEqual(3);
     
     // Check if copyright text is displayed
-    const copyrightText = footerElement.textContent;
-    expect(copyrightText).toContain('© ' + component.currentYear);
+    const copyrightText = footerElement.textContent || '';
+    // Fix type error by converting to string template
+    expect(copyrightText).toContain(`© ${component.currentYear}`);
   });
 });

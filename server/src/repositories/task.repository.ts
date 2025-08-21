@@ -89,7 +89,7 @@ export class TaskRepository implements ITaskRepository {
    * @returns Promise resolving to an array of tasks
    */
   async findByAssignee(userId: string): Promise<ITask[]> {
-    const tasks = await TaskModel.find({ assigneeId: userId });
+    const tasks = await TaskModel.find({ assignedTo: userId });
     return tasks.map(task => this.mapToEntity(task));
   }
 
@@ -149,7 +149,7 @@ export class TaskRepository implements ITaskRepository {
     }
     
     if (filter.assigneeId) {
-      query.assigneeId = filter.assigneeId;
+      query.assignedTo = filter.assigneeId;
     }
     
     if (filter.createdBy) {
@@ -171,6 +171,23 @@ export class TaskRepository implements ITaskRepository {
     }
     
     const tasks = await TaskModel.find(query as Record<string, unknown>);
+    return tasks.map(task => this.mapToEntity(task));
+  }
+
+  /**
+   * Find tasks created by or assigned to a user
+   * @param userId ID of the user
+   * @returns Promise resolving to an array of tasks
+   */
+  async findUserTasks(userId: string): Promise<ITask[]> {
+    // Find tasks where the user is either the creator or the assignee
+    const tasks = await TaskModel.find({
+      $or: [
+        { createdBy: userId },
+        { assigneeId: userId }
+      ]
+    });
+    
     return tasks.map(task => this.mapToEntity(task));
   }
 

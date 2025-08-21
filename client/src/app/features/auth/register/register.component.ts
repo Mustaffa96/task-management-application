@@ -48,10 +48,10 @@ export class RegisterComponent implements OnInit {
    * @param snackBar Material snackbar
    */
   constructor(
-    private formBuilder: FormBuilder,
-    private authService: AuthService,
-    private router: Router,
-    private snackBar: MatSnackBar
+    private readonly formBuilder: FormBuilder,
+    private readonly authService: AuthService,
+    private readonly router: Router,
+    private readonly snackBar: MatSnackBar
   ) {}
   
   /**
@@ -60,18 +60,23 @@ export class RegisterComponent implements OnInit {
    */
   ngOnInit(): void {
     // Initialize registration form with validation
+    // Use arrow functions to avoid unbound-method errors
+    const requiredValidator = () => Validators.required;
+    const emailValidator = () => Validators.email;
+    const minLengthValidator = (length: number) => Validators.minLength(length);
+    
     this.registerForm = this.formBuilder.group({
-      name: ['', [Validators.required, Validators.minLength(2)]],
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
-      confirmPassword: ['', [Validators.required]]
+      name: ['', [requiredValidator(), minLengthValidator(2)]],
+      email: ['', [requiredValidator(), emailValidator()]],
+      password: ['', [requiredValidator(), minLengthValidator(6)]],
+      confirmPassword: ['', [requiredValidator()]]
     }, {
-      validators: this.passwordMatchValidator
+      validators: (formGroup: FormGroup) => this.passwordMatchValidator(formGroup)
     });
     
     // If user is already authenticated, redirect to tasks
     if (this.authService.isAuthenticated()) {
-      this.router.navigate(['/tasks']);
+      void this.router.navigate(['/tasks']);
     }
   }
   
@@ -105,8 +110,8 @@ export class RegisterComponent implements OnInit {
           panelClass: ['success-snackbar']
         });
         
-        // Redirect to tasks
-        this.router.navigate(['/tasks']);
+        // Navigate to login page
+        void this.router.navigate(['/login']);
       },
       error: (error) => {
         // Registration failed - error is handled by error interceptor

@@ -5,6 +5,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { EventEmitter } from '@angular/core';
 import { of } from 'rxjs';
 
 import { HeaderComponent } from './header.component';
@@ -55,21 +56,28 @@ describe('HeaderComponent', () => {
 
   // Test logout functionality
   it('should call authService.logout when onLogout is called', () => {
-    component.onLogout();
+    // Use arrow function to avoid unbound-method error
+    const logoutFn = (): void => { component.onLogout(); };
+    logoutFn();
+    // Direct access to avoid unbound-method error
     expect(authService.logout).toHaveBeenCalled();
   });
 
   // Test toggle sidenav event emission
   it('should emit toggleSidenav event when onToggleSidenav is called', () => {
-    spyOn(component.toggleSidenav, 'emit');
-    component.onToggleSidenav();
-    expect(component.toggleSidenav.emit).toHaveBeenCalled();
+    // Use arrow function to avoid unbound-method error
+    const emitSpy = jasmine.createSpy('emit');
+    // Use proper type assertion
+    component.toggleSidenav = { emit: emitSpy } as unknown as EventEmitter<void>;
+    
+    const toggleFn = (): void => { component.onToggleSidenav(); };
+    toggleFn();
+    expect(emitSpy).toHaveBeenCalled();
   });
 
   // Test authenticated user display
   it('should display user menu when authenticated', () => {
-    // Override the mock to return authenticated state
-    (authService.user as any) = of({ name: 'Test User', email: 'test@example.com' });
+    // Simply set component properties directly for the test
     component.isAuthenticated = true;
     component.userName = 'Test User';
     
@@ -77,7 +85,8 @@ describe('HeaderComponent', () => {
     
     // Check if user menu is displayed (implementation depends on your template)
     // This is a placeholder - adjust based on your actual template structure
-    const userMenuElement = fixture.nativeElement.querySelector('.user-menu');
+    const nativeElement = fixture.nativeElement as HTMLElement;
+    const userMenuElement = nativeElement.querySelector('.user-menu');
     expect(userMenuElement).toBeTruthy();
   });
 });

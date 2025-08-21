@@ -1,0 +1,92 @@
+<!-- Assigned Tasks container -->
+<div class="assigned-tasks-container">
+  <div class="header-container">
+    <h1 class="page-title">
+      <mat-icon>assignment_turned_in</mat-icon>
+      Tasks Assigned to Me
+    </h1>
+  </div>
+
+  <!-- Loading spinner -->
+  <div *ngIf="isLoading" class="loading-container">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Loading your assigned tasks...</p>
+  </div>
+
+  <!-- Error message -->
+  <div *ngIf="errorMessage && !isLoading" class="error-container">
+    <mat-error>{{ errorMessage }}</mat-error>
+    <button mat-raised-button color="primary" (click)="loadAssignedTasks()" class="retry-button">
+      <mat-icon>refresh</mat-icon>
+      Retry
+    </button>
+  </div>
+
+  <!-- Tasks list -->
+  <div *ngIf="!isLoading && !errorMessage" class="tasks-list">
+    <!-- No tasks message -->
+    <div *ngIf="tasks.length === 0" class="no-tasks-container">
+      <mat-icon class="no-tasks-icon">sentiment_dissatisfied</mat-icon>
+      <p>You don't have any tasks assigned to you.</p>
+    </div>
+
+    <!-- Task cards -->
+    <mat-card *ngFor="let task of tasks" class="task-card">
+      <mat-card-header>
+        <mat-card-title>{{ task.title }}</mat-card-title>
+        <mat-card-subtitle>
+          <span [ngClass]="'priority-' + task.priority.toLowerCase()">
+            {{ task.priority | titlecase }} Priority
+          </span>
+          <span class="status-chip" [ngClass]="'status-' + task.status.toLowerCase()">
+            {{ task.status | titlecase }}
+          </span>
+        </mat-card-subtitle>
+      </mat-card-header>
+      
+      <mat-card-content>
+        <p class="task-description">{{ task.description }}</p>
+        
+        <div class="task-details">
+          <p *ngIf="task.dueDate">
+            <mat-icon>event</mat-icon>
+            <span>Due: {{ task.dueDate | date:'mediumDate' }}</span>
+          </p>
+          <p>
+            <mat-icon>person</mat-icon>
+            <span>Created by: {{ task.createdBy || 'Unknown' }}</span>
+          </p>
+          <p>
+            <mat-icon>update</mat-icon>
+            <span>Updated: {{ task.updatedAt | date:'short' }}</span>
+          </p>
+        </div>
+      </mat-card-content>
+      
+      <mat-card-actions>
+        <button mat-button color="primary" [routerLink]="['/tasks', task.id]">
+          <mat-icon>visibility</mat-icon>
+          View
+        </button>
+        
+        <!-- Status update buttons based on current status -->
+        <ng-container [ngSwitch]="task.status">
+          <button *ngSwitchCase="'PENDING'" mat-button color="accent" (click)="updateTaskStatus(task.id, 'IN_PROGRESS')">
+            <mat-icon>play_arrow</mat-icon>
+            Start Task
+          </button>
+          
+          <button *ngSwitchCase="'IN_PROGRESS'" mat-button color="accent" (click)="updateTaskStatus(task.id, 'COMPLETED')">
+            <mat-icon>check</mat-icon>
+            Complete Task
+          </button>
+          
+          <button *ngSwitchCase="'COMPLETED'" mat-button color="warn" (click)="updateTaskStatus(task.id, 'IN_PROGRESS')">
+            <mat-icon>replay</mat-icon>
+            Reopen Task
+          </button>
+        </ng-container>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+</div>

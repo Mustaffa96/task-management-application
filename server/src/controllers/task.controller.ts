@@ -142,6 +142,11 @@ export class TaskController {
     
     const { id } = req.params;
     
+    // Check if this is a special route parameter that should be handled elsewhere
+    if (id === 'assigned' || id === 'my-tasks') {
+      throw new AppError('Invalid task ID', 400);
+    }
+    
     // Get task from repository
     const task = await this.taskRepository.findById(id);
     
@@ -261,5 +266,49 @@ export class TaskController {
       // Re-throw other errors
       throw error;
     }
+  };
+  
+  /**
+   * Get tasks assigned to the current user
+   * @param req Express request object
+   * @param res Express response object
+   */
+  getAssignedTasks = async (req: AuthRequest, res: Response): Promise<void> => {
+    // Ensure user is authenticated
+    if (!req.user) {
+      throw new AppError('Authentication required', 401);
+    }
+    
+    // Get tasks assigned to the current user
+    const tasks = await this.taskRepository.findByAssignee(req.user.id);
+    
+    // Return success response
+    res.status(200).json({
+      success: true,
+      message: 'Assigned tasks retrieved successfully',
+      data: tasks
+    });
+  };
+
+  /**
+   * Get tasks created by or assigned to the current user
+   * @param req Express request object
+   * @param res Express response object
+   */
+  getUserTasks = async (req: AuthRequest, res: Response): Promise<void> => {
+    // Ensure user is authenticated
+    if (!req.user) {
+      throw new AppError('Authentication required', 401);
+    }
+    
+    // Get tasks created by or assigned to the current user
+    const tasks = await this.taskRepository.findUserTasks(req.user.id);
+    
+    // Return success response
+    res.status(200).json({
+      success: true,
+      message: 'User tasks retrieved successfully',
+      data: tasks
+    });
   };
 }

@@ -2,10 +2,11 @@ import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { of } from 'rxjs';
 
-import { AuthService } from './auth.service';
+import { AuthService } from '../../core/services/auth.service';
 import { environment } from '../../../environments/environment';
+import type { User } from '../../core/models/user.model';
+import type { AuthResponse, LoginRequest, RegisterRequest } from '../../core/models/auth.model';
 
 // Mock classes
 class RouterMock {
@@ -49,26 +50,33 @@ describe('AuthService', () => {
   });
 
   // Test login method
-  it('should login user and update currentUserSubject', () => {
-    // Mock user data
-    const mockUser = {
+  it('should login user and update user subject', () => {
+    // Mock user data with proper typing
+    const mockUser: LoginRequest = {
       email: 'test@example.com',
       password: 'password123'
     };
     
-    const mockResponse = {
-      user: {
-        id: '1',
-        name: 'Test User',
-        email: 'test@example.com',
-        role: 'user'
-      },
-      token: 'mock-token'
+    // Create a properly typed response structure
+    const mockResponseData = {
+      success: true,
+      message: 'Login successful',
+      data: {
+        user: {
+          id: '1',
+          name: 'Test User',
+          email: 'test@example.com',
+          role: 'user'
+        },
+        token: 'mock-token'
+      }
     };
 
     // Call login method
-    service.login(mockUser).subscribe(response => {
-      expect(response).toEqual(mockResponse);
+    service.login(mockUser).subscribe((response: AuthResponse & { authSuccess: boolean }) => {
+      // Verify response contains expected data
+      expect(response.id).toBe('1');
+      expect(response.authSuccess).toBeTrue();
     });
 
     // Expect a POST request to the login endpoint
@@ -76,35 +84,42 @@ describe('AuthService', () => {
     expect(req.request.method).toBe('POST');
     
     // Respond with mock data
-    req.flush(mockResponse);
+    req.flush(mockResponseData);
     
-    // Check if currentUserSubject was updated
-    service.currentUser$.subscribe(user => {
-      expect(user).toEqual(mockResponse.user);
+    // Check if user observable was updated
+    service.user.subscribe((user: User | null) => {
+      expect(user).not.toBeNull();
+      if (user) {
+        expect(user.id).toBe('1');
+        expect(user.name).toBe('Test User');
+      }
     });
     
-    // Check if isAuthenticated was updated
-    service.isAuthenticated$.subscribe(isAuth => {
-      expect(isAuth).toBeTrue();
-    });
+    // Check if isAuthenticated returns true
+    expect(service.isAuthenticated()).toBeTrue();
   });
 
   // Test register method
   it('should register a new user', () => {
-    // Mock user data
-    const mockUser = {
+    // Mock user data with proper typing
+    const mockUser: RegisterRequest = {
       name: 'New User',
       email: 'new@example.com',
       password: 'password123'
     };
     
-    const mockResponse = {
-      message: 'User registered successfully'
+    const mockResponse: AuthResponse = {
+      id: '1',
+      name: 'New User',
+      email: 'new@example.com',
+      role: 'user',
+      token: 'mock-token'
     };
 
     // Call register method
-    service.register(mockUser).subscribe(response => {
-      expect(response).toEqual(mockResponse);
+    service.register(mockUser).subscribe((response: AuthResponse) => {
+      expect(response.id).toBe('1');
+      expect(response.name).toBe('New User');
     });
 
     // Expect a POST request to the register endpoint
@@ -116,9 +131,19 @@ describe('AuthService', () => {
   });
 
   // Test logout method
-  it('should logout user and clear currentUserSubject', () => {
-    // Setup: first set a user
-    service['currentUserSubject'].next({ id: '1', name: 'Test User', email: 'test@example.com', role: 'user' });
+  it('should logout user and clear user subject', () => {
+    // Setup: first set a user by accessing the private userSubject property
+    // Using type assertion to access private property
+    const testUser: User = { 
+      id: '1', 
+      name: 'Test User', 
+      email: 'test@example.com', 
+      role: 'user',
+      token: 'test-token'
+    };
+    // Type the service properly to avoid unsafe member access
+    const serviceWithPrivateAccess = service as { [key: string]: any };
+    serviceWithPrivateAccess['userSubject'].next(testUser);
     
     // Call logout method
     service.logout();
@@ -130,50 +155,57 @@ describe('AuthService', () => {
     // Respond with success
     req.flush({ message: 'Logged out successfully' });
     
-    // Check if currentUserSubject was cleared
-    service.currentUser$.subscribe(user => {
+    // Check if user was cleared
+    service.user.subscribe((user: User | null) => {
       expect(user).toBeNull();
     });
     
     // Check if isAuthenticated was updated
-    service.isAuthenticated$.subscribe(isAuth => {
-      expect(isAuth).toBeFalse();
-    });
+    const isAuthenticated = service.isAuthenticated();
+    expect(isAuthenticated).toBeFalse();
     
     // Check if router was called to navigate to login
-    expect(router.navigate).toHaveBeenCalledWith(['/auth/login']);
+    // Direct access to avoid unbound-method error
+    expect(router.navigate).toHaveBeenCalledWith(['/login']);
   });
 
   // Test autoLogin method
   it('should auto login user if token exists', () => {
-    // Mock response for refresh token endpoint
+    // Mock response for verify endpoint with proper structure
     const mockResponse = {
-      user: {
-        id: '1',
-        name: 'Test User',
-        email: 'test@example.com',
-        role: 'user'
+      success: true,
+      message: 'Token verified',
+      data: {
+        user: {
+          id: '1',
+          name: 'Test User',
+          email: 'test@example.com',
+          role: 'user'
+        },
+        token: 'mock-token'
       }
     };
 
     // Call autoLogin method
     service.autoLogin();
 
-    // Expect a GET request to the refresh token endpoint
-    const req = httpMock.expectOne(`${environment.apiUrl}/auth/refresh-token`);
+    // Expect a GET request to the verify endpoint
+    const req = httpMock.expectOne(`${environment.apiUrl}/auth/verify`);
     expect(req.request.method).toBe('GET');
     
     // Respond with mock data
     req.flush(mockResponse);
     
-    // Check if currentUserSubject was updated
-    service.currentUser$.subscribe(user => {
-      expect(user).toEqual(mockResponse.user);
+    // Check if user observable was updated
+    service.user.subscribe((user: User | null) => {
+      expect(user).not.toBeNull();
+      if (user) {
+        expect(user.id).toBe('1');
+        expect(user.name).toBe('Test User');
+      }
     });
     
-    // Check if isAuthenticated was updated
-    service.isAuthenticated$.subscribe(isAuth => {
-      expect(isAuth).toBeTrue();
-    });
+    // Check if isAuthenticated returns true
+    expect(service.isAuthenticated()).toBeTrue();
   });
 });

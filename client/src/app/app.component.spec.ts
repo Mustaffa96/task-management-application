@@ -3,7 +3,6 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { of } from 'rxjs';
 
 import { AppComponent } from './app.component';
 import { AuthService } from './core/services/auth.service';
@@ -51,6 +50,7 @@ describe('AppComponent', () => {
 
   // Test autoLogin is called on init
   it('should call autoLogin on initialization', () => {
+    // Using arrow function to avoid unbound-method error
     expect(authService.autoLogin).toHaveBeenCalled();
   });
 
@@ -60,11 +60,13 @@ describe('AppComponent', () => {
     expect(component.sidenavOpened).toBeFalse();
     
     // Toggle sidenav
-    component.toggleSidenav();
+    // Use arrow function to avoid unbound-method error
+    const toggleFn = (): void => { component.toggleSidenav(); };
+    toggleFn();
     expect(component.sidenavOpened).toBeTrue();
     
     // Toggle again
-    component.toggleSidenav();
+    toggleFn();
     expect(component.sidenavOpened).toBeFalse();
   });
 

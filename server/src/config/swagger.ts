@@ -10,7 +10,7 @@ import config from './config';
  */
 const swaggerOptions = {
   definition: {
-    openapi: '3.0.0',
+    openapi: '3.0.0',  // Using OpenAPI 3.0.0 specification
     info: {
       title: 'Task Management API',
       version: '1.0.0',
@@ -36,6 +36,7 @@ const swaggerOptions = {
           type: 'http',
           scheme: 'bearer',
           bearerFormat: 'JWT',
+          description: 'Enter your bearer token in the format "Bearer {token}". Token must be obtained from the /api/auth/login endpoint. Sample tokens will not work.',
         },
       },
       schemas: {
@@ -142,47 +143,44 @@ const swaggerOptions = {
             },
           },
         },
+        LoginResponse: {
+          type: 'object',
+          properties: {
+            success: {
+              type: 'boolean',
+              example: true
+            },
+            message: {
+              type: 'string',
+              example: 'Login successful'
+            },
+            data: {
+              type: 'object',
+              properties: {
+                user: {
+                  $ref: '#/components/schemas/User'
+                },
+                token: {
+                  type: 'string',
+                  example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+                }
+              }
+            }
+          }
+        }
       },
       responses: {
         UnauthorizedError: {
-          description: 'Authentication information is missing or invalid',
-          content: {
-            'application/json': {
-              schema: {
-                $ref: '#/components/schemas/Error',
-              },
-            },
-          },
+          description: 'Authentication information is missing or invalid'
         },
         NotFoundError: {
-          description: 'The requested resource was not found',
-          content: {
-            'application/json': {
-              schema: {
-                $ref: '#/components/schemas/Error',
-              },
-            },
-          },
+          description: 'The requested resource was not found'
         },
         BadRequestError: {
-          description: 'Invalid request parameters',
-          content: {
-            'application/json': {
-              schema: {
-                $ref: '#/components/schemas/Error',
-              },
-            },
-          },
+          description: 'Invalid request parameters'
         },
         ForbiddenError: {
-          description: 'User does not have permission to access the resource',
-          content: {
-            'application/json': {
-              schema: {
-                $ref: '#/components/schemas/Error',
-              },
-            },
-          },
+          description: 'User does not have permission to access the resource'
         },
       },
     },
@@ -201,7 +199,7 @@ const swaggerOptions = {
       },
     ],
   },
-  apis: ['./src/routes/*.ts', './src/models/*.ts'],
+  apis: ['./src/routes/*.ts', './src/controllers/*.ts', './src/models/*.ts'],
 };
 
 /**

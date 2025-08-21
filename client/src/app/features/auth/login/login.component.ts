@@ -49,11 +49,11 @@ export class LoginComponent implements OnInit {
    * @param snackBar Material snackbar
    */
   constructor(
-    private formBuilder: FormBuilder,
-    private authService: AuthService,
-    private router: Router,
-    private route: ActivatedRoute,
-    private snackBar: MatSnackBar
+    private readonly formBuilder: FormBuilder,
+    private readonly authService: AuthService,
+    private readonly router: Router,
+    private readonly route: ActivatedRoute,
+    private readonly snackBar: MatSnackBar
   ) {}
   
   /**
@@ -62,9 +62,14 @@ export class LoginComponent implements OnInit {
    */
   ngOnInit(): void {
     // Initialize login form with validation
+    // Use arrow functions to avoid unbound-method errors
+    const requiredValidator = () => Validators.required;
+    const emailValidator = () => Validators.email;
+    const minLengthValidator = (length: number) => Validators.minLength(length);
+    
     this.loginForm = this.formBuilder.group({
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]]
+      email: ['', [requiredValidator(), emailValidator()]],
+      password: ['', [requiredValidator(), minLengthValidator(6)]]
     });
     
     // Get return URL from route parameters or default to '/tasks'
@@ -72,7 +77,7 @@ export class LoginComponent implements OnInit {
     
     // If user is already authenticated, redirect to return URL
     if (this.authService.isAuthenticated()) {
-      this.router.navigate([this.returnUrl]);
+      void this.router.navigate([this.returnUrl]);
     }
   }
   
@@ -99,18 +104,68 @@ export class LoginComponent implements OnInit {
     // Attempt login
     this.authService.login(loginData).subscribe({
       next: (response) => {
-        // Login successful
+        // Login successful - API call worked
         this.snackBar.open('Login successful!', 'Close', {
           duration: 3000,
           panelClass: ['success-snackbar']
         });
         
-        // Redirect to return URL
-        this.router.navigate([this.returnUrl]);
+        // Give the auth service a moment to update the authentication state
+        setTimeout(() => {
+          // Check authentication state after a small delay
+          const isAuthenticated = this.authService.isAuthenticated();
+          const currentUser = this.authService.getCurrentUser();
+          
+          // Log authentication state for debugging
+          console.log('Authentication state after login (with delay):', {
+            authSuccess: response.authSuccess,
+            isAuthenticated: isAuthenticated,
+            hasUser: !!currentUser,
+            returnUrl: this.returnUrl
+          });
+          
+          if (isAuthenticated && currentUser) {
+            // Authentication was successful, navigate to tasks
+            console.log('Authentication confirmed, navigating to:', this.returnUrl);
+            
+            // Redirect to return URL
+            void this.router.navigate([this.returnUrl])
+              .then(success => {
+                console.log('Navigation result:', success ? 'successful' : 'failed');
+                if (!success) {
+                  // If navigation fails, try navigating to the root tasks route
+                  void this.router.navigate(['/tasks'])
+                    .then(fallbackSuccess => {
+                      console.log('Fallback navigation result:', fallbackSuccess ? 'successful' : 'failed');
+                      if (!fallbackSuccess) {
+                        // If all navigation attempts fail, show error
+                        this.snackBar.open('Navigation failed. Please try again.', 'Close', {
+                          duration: 5000,
+                          panelClass: ['error-snackbar']
+                        });
+                      }
+                    });
+                }
+              });
+          } else {
+            // Authentication failed despite successful API response
+            console.error('Authentication state not properly set after login');
+            this.snackBar.open('Login successful but session setup failed. Please try again.', 'Close', {
+              duration: 5000,
+              panelClass: ['error-snackbar']
+            });
+            this.isLoading = false;
+          }
+        }, 200); // Give auth service time to update state
       },
       error: (error) => {
-        // Login failed - error is handled by error interceptor
+        // Login failed - show error message
+        console.error('Login error:', error);
         this.isLoading = false;
+        this.snackBar.open(error.error?.message || 'Login failed. Please check your credentials.', 'Close', {
+          duration: 5000,
+          panelClass: ['error-snackbar']
+        });
       },
       complete: () => {
         this.isLoading = false;

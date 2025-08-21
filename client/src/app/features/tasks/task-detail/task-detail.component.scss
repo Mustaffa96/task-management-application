@@ -1,0 +1,134 @@
+/* Task detail container styles */
+.task-detail-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Back button styles */
+.back-button {
+  margin-bottom: 20px;
+}
+
+/* Loading container styles */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  padding: 40px 0;
+}
+
+/* Error container styles */
+.error-container {
+  text-align: center;
+  padding: 20px;
+  background-color: #fff3f3;
+  border-radius: 4px;
+  margin: 20px 0;
+
+  .retry-button {
+    margin-top: 15px;
+  }
+}
+
+/* Task card styles */
+.task-card {
+  margin-bottom: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Task info section styles */
+.task-info {
+  padding: 10px 0;
+}
+
+/* Info section styles */
+.info-section {
+  margin-bottom: 20px;
+
+  h3 {
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 10px;
+    color: #555;
+  }
+}
+
+/* Task description styles */
+.task-description {
+  white-space: pre-line;
+  line-height: 1.6;
+  color: #333;
+}
+
+/* Detail item styles */
+.detail-item {
+  margin-bottom: 8px;
+  
+  strong {
+    font-weight: 500;
+    margin-right: 5px;
+  }
+}
+
+/* Priority badge styles */
+.priority-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  margin-left: 10px;
+  font-weight: 500;
+}
+
+.priority-high {
+  background-color: #ffebee;
+  color: #d32f2f;
+}
+
+.priority-medium {
+  background-color: #fff8e1;
+  color: #ff8f00;
+}
+
+.priority-low {
+  background-color: #e8f5e9;
+  color: #388e3c;
+}
+
+/* Status badge styles */
+.status-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  margin-right: 10px;
+  font-weight: 500;
+}
+
+.status-todo {
+  background-color: #e3f2fd;
+  color: #1976d2;
+}
+
+.status-in-progress {
+  background-color: #fff8e1;
+  color: #ff8f00;
+}
+
+.status-done {
+  background-color: #e8f5e9;
+  color: #388e3c;
+}
+
+/* Due date styles */
+.due-date {
+  font-size: 12px;
+  color: #666;
+}
+
+/* Card actions styles */
+mat-card-actions {
+  padding: 16px;
+  display: flex;
+  gap: 10px;
+}

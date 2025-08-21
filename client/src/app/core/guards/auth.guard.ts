@@ -27,8 +27,8 @@ export class AuthGuard implements CanActivate {
    * @param router Angular router
    */
   constructor(
-    private authService: AuthService,
-    private router: Router
+    private readonly authService: AuthService,
+    private readonly router: Router
   ) {}
   
   /**

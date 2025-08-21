@@ -43,8 +43,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
    * @param router Angular router
    */
   constructor(
-    private authService: AuthService,
-    private router: Router
+    private readonly authService: AuthService,
+    private readonly router: Router
   ) {}
   
   /**
@@ -85,6 +85,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
    */
   onLogout(): void {
     this.authService.logout();
-    this.router.navigate(['/login']);
+    void this.router.navigate(['/login']);
   }
 }

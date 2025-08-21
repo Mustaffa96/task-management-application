@@ -23,6 +23,45 @@
   padding: 40px 0;
 }
 
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px;
+  text-align: center;
+  
+  mat-error {
+    margin-bottom: 16px;
+    font-size: 16px;
+  }
+  
+  .retry-button {
+    margin-top: 8px;
+  }
+}
+
+.no-data-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 0;
+  text-align: center;
+  
+  .no-data-icon {
+    font-size: 48px;
+    height: 48px;
+    width: 48px;
+    margin-bottom: 16px;
+    color: #757575;
+  }
+  
+  p {
+    font-size: 16px;
+    color: #757575;
+  }
+}
+
 .profile-info {
   margin-bottom: 24px;
   

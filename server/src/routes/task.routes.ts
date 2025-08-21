@@ -126,6 +126,42 @@ router.get('/', taskController.getTasks);
 
 /**
  * @swagger
+ * /tasks/assigned:
+ *   get:
+ *     summary: Get tasks assigned to the current user
+ *     tags: [Tasks]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Assigned tasks retrieved successfully
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Server error
+ */
+router.get('/assigned', taskController.getAssignedTasks);
+
+/**
+ * @swagger
+ * /tasks/my-tasks:
+ *   get:
+ *     summary: Get tasks created by or assigned to the current user
+ *     tags: [Tasks]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: User tasks retrieved successfully
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Server error
+ */
+router.get('/my-tasks', taskController.getUserTasks);
+
+/**
+ * @swagger
  * /tasks/{id}:
  *   get:
  *     summary: Get a task by ID

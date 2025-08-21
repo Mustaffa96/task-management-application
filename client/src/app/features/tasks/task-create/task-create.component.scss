@@ -1,0 +1,79 @@
+/**
+ * Styles for Task Create component
+ */
+
+// Container styles
+.task-create-container {
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+// Header styles
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  
+  .page-title {
+    display: flex;
+    align-items: center;
+    margin: 0;
+    
+    mat-icon {
+      margin-right: 8px;
+      color: #3f51b5;
+    }
+  }
+}
+
+// Form styles
+.task-form {
+  mat-card {
+    padding: 24px;
+  }
+  
+  mat-card-content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+}
+
+// Full width form fields
+.full-width {
+  width: 100%;
+}
+
+// Form row for side-by-side fields
+.form-row {
+  display: flex;
+  gap: 16px;
+  
+  mat-form-field {
+    flex: 1;
+  }
+}
+
+// Form actions container
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+}
+
+// Error message container
+.error-message {
+  padding: 12px;
+  border-radius: 4px;
+  background-color: rgba(244, 67, 54, 0.1);
+  margin-bottom: 16px;
+}
+
+// Button spinner
+.button-spinner {
+  display: inline-block;
+  margin-right: 8px;
+  vertical-align: middle;
+}

@@ -1,0 +1,101 @@
+<!-- Task Create container -->
+<div class="task-create-container">
+  <div class="header-container">
+    <h1 class="page-title">
+      <mat-icon>add_task</mat-icon>
+      Create New Task
+    </h1>
+  </div>
+
+  <!-- Task creation form -->
+  <form [formGroup]="taskForm" (ngSubmit)="onSubmit()" class="task-form">
+    <mat-card>
+      <mat-card-content>
+        <!-- Title field -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Task Title</mat-label>
+          <input matInput formControlName="title" placeholder="Enter task title">
+          <mat-error *ngIf="hasError('title', 'required')">
+            Title is required
+          </mat-error>
+          <mat-error *ngIf="hasError('title', 'minlength')">
+            Title must be at least 3 characters
+          </mat-error>
+          <mat-error *ngIf="hasError('title', 'maxlength')">
+            Title cannot exceed 100 characters
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Description field -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Description</mat-label>
+          <textarea matInput formControlName="description" placeholder="Enter task description" rows="5"></textarea>
+          <mat-error *ngIf="hasError('description', 'required')">
+            Description is required
+          </mat-error>
+          <mat-error *ngIf="hasError('description', 'minlength')">
+            Description must be at least 10 characters
+          </mat-error>
+          <mat-error *ngIf="hasError('description', 'maxlength')">
+            Description cannot exceed 1000 characters
+          </mat-error>
+        </mat-form-field>
+
+        <div class="form-row">
+          <!-- Priority field -->
+          <mat-form-field appearance="outline">
+            <mat-label>Priority</mat-label>
+            <mat-select formControlName="priority">
+              <mat-option *ngFor="let priority of priorities" [value]="priority.value">
+                {{ priority.label }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="hasError('priority', 'required')">
+              Priority is required
+            </mat-error>
+          </mat-form-field>
+
+          <!-- Due date field -->
+          <mat-form-field appearance="outline">
+            <mat-label>Due Date</mat-label>
+            <input matInput [matDatepicker]="picker" formControlName="dueDate" placeholder="Choose a date">
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+          </mat-form-field>
+        </div>
+
+        <!-- Assigned to field -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Assign To</mat-label>
+          <mat-select formControlName="assignedTo">
+            <mat-option>None</mat-option>
+            <mat-option *ngIf="isLoadingUsers" disabled>Loading users...</mat-option>
+            <mat-option *ngFor="let user of users" [value]="user.id">
+              {{ user.name }} ({{ user.email }})
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <!-- Error message -->
+        <div *ngIf="errorMessage" class="error-message">
+          <mat-error>{{ errorMessage }}</mat-error>
+        </div>
+      </mat-card-content>
+
+      <mat-card-actions>
+        <div class="form-actions">
+          <button mat-button type="button" routerLink="/tasks">Cancel</button>
+          <button 
+            mat-raised-button 
+            color="primary" 
+            type="submit" 
+            [disabled]="isSubmitting">
+            <mat-spinner *ngIf="isSubmitting" diameter="20" class="button-spinner"></mat-spinner>
+            <span *ngIf="!isSubmitting">Create Task</span>
+            <span *ngIf="isSubmitting">Creating...</span>
+          </button>
+        </div>
+      </mat-card-actions>
+    </mat-card>
+  </form>
+</div>

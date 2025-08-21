@@ -3,11 +3,8 @@
  * Handles task management functionality
  */
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterModule, Routes } from '@angular/router';
-import { ReactiveFormsModule } from '@angular/forms';
-
-// Material imports
+import { CommonModule, DatePipe, TitleCasePipe } from '@angular/common';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -20,24 +17,43 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
-// Routes for tasks feature
-const routes: Routes = [
-  {
-    path: '',
-    loadChildren: () => import('./task-list/task-list.module').then(m => m.TaskListModule)
-  }
-];
+// Routing
+import { TasksRoutingModule } from './tasks-routing.module';
+
+// Components
+import { TaskListComponent } from './task-list/task-list.component';
+import { MyTasksComponent } from './my-tasks/my-tasks.component';
+import { AssignedTasksComponent } from './assigned-tasks/assigned-tasks.component';
+import { TaskCreateComponent } from './task-create/task-create.component';
+import { TaskDetailComponent } from './task-detail/task-detail.component';
+import { TaskEditComponent } from './task-edit/task-edit.component';
+
 
 /**
  * Tasks feature module
  */
 @NgModule({
-  declarations: [],
+  declarations: [
+    TaskListComponent,
+    MyTasksComponent,
+    AssignedTasksComponent,
+    TaskCreateComponent,
+    TaskDetailComponent,
+    TaskEditComponent
+  ],
+  providers: [
+    DatePipe,
+    TitleCasePipe
+  ],
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    RouterModule.forChild(routes),
+    FormsModule,
+    TasksRoutingModule,
     // Material modules
     MatCardModule,
     MatButtonModule,
@@ -50,7 +66,10 @@ const routes: Routes = [
     MatChipsModule,
     MatDialogModule,
     MatMenuModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatCheckboxModule,
+    MatProgressBarModule,
+    MatSnackBarModule
   ]
 })
 export class TasksModule { }

@@ -6,6 +6,7 @@ import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
+import cookieParser from 'cookie-parser';
 
 // Import configuration
 import config from './config/config';
@@ -34,12 +35,39 @@ const PORT: number = parseInt(config.server.port as string, 10);
  * Middleware setup
  */
 // Security middleware
-app.use(helmet()); // Set security HTTP headers
-app.use(cors(config.cors)); // Enable CORS
+// Configure Helmet with adjusted settings for Swagger UI
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"], // Required for Swagger UI
+      styleSrc: ["'self'", "'unsafe-inline'", "https:"],
+      imgSrc: ["'self'", "data:"],
+      connectSrc: ["'self'", "http://localhost:*", "ws://localhost:*"],
+    },
+  },
+})); 
+
+// Configure CORS
+const corsOptions = {
+  origin: config.cors.origin === '*' ? 'http://localhost:4200' : config.cors.origin,
+  credentials: true,
+  optionsSuccessStatus: 200,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept']
+};
+app.use(cors(corsOptions));
+
+// Log CORS configuration for debugging
+console.log('CORS configuration:', {
+  origin: corsOptions.origin,
+  credentials: corsOptions.credentials
+});
 
 // Request parsing
 app.use(express.json()); // Parse JSON request body
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded request body
+app.use(cookieParser()); // Parse cookies
 
 // Logging middleware
 app.use(morgan('dev')); // Log HTTP requests

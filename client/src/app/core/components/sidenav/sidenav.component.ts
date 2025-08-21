@@ -40,7 +40,7 @@ export class SidenavComponent implements OnInit, OnDestroy {
    * Constructor
    * @param authService Authentication service
    */
-  constructor(private authService: AuthService) {}
+  constructor(private readonly authService: AuthService) {}
   
   /**
    * Lifecycle hook that is called after component initialization

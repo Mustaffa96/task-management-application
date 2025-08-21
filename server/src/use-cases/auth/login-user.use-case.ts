@@ -2,7 +2,7 @@
  * Login User Use Case
  * Handles the business logic for user authentication
  */
-import jwt from 'jsonwebtoken';
+import jwt, { SignOptions } from 'jsonwebtoken';
 import { IUserRepository } from '../../interfaces/user-repository.interface';
 import config from '../../config/config';
 import UserModel from '../../models/user.model';
@@ -75,8 +75,8 @@ export class LoginUserUseCase {
         email: user.email,
         role: user.role 
       },
-      config.jwt.secret,
-      { expiresIn: config.jwt.expiresIn }
+      String(config.jwt.secret),
+      { expiresIn: config.jwt.expiresIn } as SignOptions
     );
     
     // Return user data and token

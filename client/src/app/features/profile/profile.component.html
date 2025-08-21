@@ -14,14 +14,24 @@
     <div *ngIf="isLoading" class="loading-container">
       <mat-spinner diameter="40"></mat-spinner>
     </div>
+
+    <!-- Error message -->
+    <div *ngIf="errorMessage && !isLoading" class="error-container">
+      <mat-error>{{ errorMessage }}</mat-error>
+      <button mat-raised-button color="primary" (click)="loadUserProfile()" class="retry-button">
+        <mat-icon>refresh</mat-icon>
+        Retry
+      </button>
+    </div>
     
     <!-- Profile content -->
-    <mat-card-content *ngIf="!isLoading">
+    <mat-card-content *ngIf="!isLoading && !errorMessage && userData">
       <div class="profile-info">
         <h2>Account Information</h2>
-        <p><strong>Name:</strong> John Doe</p>
-        <p><strong>Email:</strong> john.doe@example.com</p>
-        <p><strong>Member Since:</strong> January 1, 2025</p>
+        <p><strong>Name:</strong> {{ userData.name }}</p>
+        <p><strong>Email:</strong> {{ userData.email }}</p>
+        <p><strong>Role:</strong> {{ userData.role | titlecase }}</p>
+        <p><strong>User ID:</strong> {{ userData.id }}</p>
       </div>
       
       <mat-divider></mat-divider>
@@ -38,6 +48,14 @@
             Change Password
           </button>
         </div>
+      </div>
+    </mat-card-content>
+
+    <!-- No data state -->
+    <mat-card-content *ngIf="!isLoading && !errorMessage && !userData">
+      <div class="no-data-container">
+        <mat-icon class="no-data-icon">sentiment_dissatisfied</mat-icon>
+        <p>No profile data available.</p>
       </div>
     </mat-card-content>
   </mat-card>

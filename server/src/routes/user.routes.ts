@@ -80,6 +80,34 @@ router.get('/', async (req: AuthRequest, res: express.Response) => {
  *       500:
  *         description: Server error
  */
+// Profile route must be defined BEFORE the :id route to prevent 'profile' being treated as an ID
+router.get('/profile', async (req: AuthRequest, res: express.Response) => {
+  try {
+    // Ensure user is authenticated
+    if (!req.user) {
+      throw new AppError('Authentication required', 401);
+    }
+    
+    // Get user from repository
+    const user = await userRepository.findById(req.user.id);
+    
+    // Check if user exists
+    if (!user) {
+      throw new AppError('User not found', 404);
+    }
+    
+    // Return success response
+    res.status(200).json({
+      success: true,
+      message: 'User profile retrieved successfully',
+      data: user
+    });
+  } catch (error) {
+    // Re-throw errors
+    throw error;
+  }
+});
+
 router.get('/:id', async (req: AuthRequest, res: express.Response) => {
   try {
     // Ensure user is authenticated
@@ -109,50 +137,6 @@ router.get('/:id', async (req: AuthRequest, res: express.Response) => {
   }
 });
 
-/**
- * @swagger
- * /users/profile:
- *   get:
- *     summary: Get current user profile
- *     tags: [Users]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: User profile retrieved successfully
- *       401:
- *         description: Unauthorized
- *       404:
- *         description: User not found
- *       500:
- *         description: Server error
- */
-router.get('/profile/me', async (req: AuthRequest, res: express.Response) => {
-  try {
-    // Ensure user is authenticated
-    if (!req.user) {
-      throw new AppError('Authentication required', 401);
-    }
-    
-    // Get user from repository
-    const user = await userRepository.findById(req.user.id);
-    
-    // Check if user exists
-    if (!user) {
-      throw new AppError('User not found', 404);
-    }
-    
-    // Return success response
-    res.status(200).json({
-      success: true,
-      message: 'User profile retrieved successfully',
-      data: user
-    });
-  } catch (error) {
-    // Re-throw errors
-    throw error;
-  }
-});
 
 /**
  * @swagger

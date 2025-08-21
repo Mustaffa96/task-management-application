@@ -10,11 +10,12 @@ import {
   HttpInterceptor,
   HttpErrorResponse
 } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { Observable, throwError, of } from 'rxjs';
+import { catchError, switchMap } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { AuthService } from '../services/auth.service';
+import { environment } from '@environments/environment';
 
 /**
  * Error Interceptor
@@ -29,9 +30,9 @@ export class ErrorInterceptor implements HttpInterceptor {
    * @param authService Authentication service
    */
   constructor(
-    private router: Router,
-    private snackBar: MatSnackBar,
-    private authService: AuthService
+    private readonly router: Router,
+    private readonly snackBar: MatSnackBar,
+    private readonly authService: AuthService
   ) {}
 
   /**
@@ -59,25 +60,66 @@ export class ErrorInterceptor implements HttpInterceptor {
           
           // Handle specific status codes
           switch (error.status) {
-            case 401: // Unauthorized
-              // Auto logout if 401 response returned from API
-              this.authService.logout();
-              this.router.navigate(['/login']);
-              errorMessage = 'Session expired. Please log in again.';
-              break;
+            case 401: { // Unauthorized
+              // Check if this is an API request and not a refresh token request
+              const isApiUrl = request.url.startsWith(environment.apiUrl);
+              const isRefreshRequest = request.url.includes('/refresh');
+              const isLoginRequest = request.url.includes('/login');
+              const isTasksRequest = request.url.includes('/tasks');
               
-            case 403: // Forbidden
-              this.router.navigate(['/tasks']);
+              console.log('401 Error intercepted:', { 
+                url: request.url, 
+                isApiUrl, 
+                isRefreshRequest,
+                isTasksRequest,
+                hasUser: !!this.authService.getCurrentUser()
+              });
+              
+              // Don't attempt to refresh token for login requests
+              if (isLoginRequest) {
+                errorMessage = 'Invalid email or password';
+                break;
+              }
+              
+              // For tasks requests, we'll handle them more gracefully
+              // The TaskService has special handling for 401 errors
+              if (isTasksRequest) {
+                console.log('Task request with authentication error, handled by TaskService');
+                return throwError(() => error);
+              }
+              
+              if (isApiUrl && !isRefreshRequest && this.authService.getCurrentUser()) {
+                console.log('Attempting token refresh before giving up');
+                // Try to refresh the token before giving up
+                return this.handleUnauthorizedError(request, next);
+              } else if (isRefreshRequest) {
+                // Only logout if this is a failed refresh request
+                console.warn('Token refresh failed, logging out');
+                this.authService.logout();
+                void this.router.navigate(['/login']);
+                errorMessage = 'Session expired. Please log in again.';
+              } else if (!this.authService.getCurrentUser()) {
+                // User is not logged in, just show error message
+                errorMessage = 'Authentication required. Please log in.';
+              }
+              break;
+            }
+            
+            case 403: { // Forbidden
+              void this.router.navigate(['/tasks']);
               errorMessage = 'You do not have permission to access this resource.';
               break;
-              
-            case 404: // Not Found
+            }
+            
+            case 404: { // Not Found
               errorMessage = 'Resource not found.';
               break;
-              
-            case 500: // Server Error
+            }
+            
+            case 500: { // Server Error
               errorMessage = 'Server error. Please try again later.';
               break;
+            }
           }
         }
         
@@ -90,6 +132,48 @@ export class ErrorInterceptor implements HttpInterceptor {
         });
         
         // Pass the error along
+        return throwError(() => new Error(errorMessage));
+      })
+    );
+  }
+  
+  /**
+   * Handle 401 Unauthorized errors by attempting to refresh the token
+   * @param request The original request that failed
+   * @param next The next handler
+   * @returns An observable of the HTTP event after token refresh attempt
+   */
+  private handleUnauthorizedError(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
+    return this.authService.verifyToken().pipe(
+      switchMap(() => {
+        // Get the updated token
+        const currentUser = this.authService.getCurrentUser();
+        
+        // Clone the request with the new token
+        if (currentUser && currentUser.token) {
+          request = request.clone({
+            setHeaders: {
+              Authorization: `Bearer ${currentUser.token}`
+            }
+          });
+        }
+        
+        // Retry the request with the new token
+        return next.handle(request);
+      }),
+      catchError(error => {
+        // If refresh token fails, logout and redirect
+        this.authService.logout();
+        void this.router.navigate(['/login']);
+        
+        const errorMessage = 'Session expired. Please log in again.';
+        this.snackBar.open(errorMessage, 'Close', {
+          duration: 5000,
+          horizontalPosition: 'center',
+          verticalPosition: 'bottom',
+          panelClass: ['error-snackbar']
+        });
+        
         return throwError(() => new Error(errorMessage));
       })
     );
